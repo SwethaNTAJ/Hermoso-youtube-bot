@@ -206,9 +206,9 @@ def run_bot():
     print("✅ Cycle Done")
 
 # ---------------- ⏰ SCHEDULER ----------------
-schedule.every(1).minutes.do(run_bot)
+schedule.every(10).minutes.do(run_bot)
 
-print("🚀 Bot started (runs every 1 mins)...")
+print("🚀 Bot started (runs every 10 mins)...")
 
 while True:
     schedule.run_pending()
