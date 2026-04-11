@@ -1,35 +1,39 @@
-import json,os
+ 
+import json, os
 import requests
 import time
 import random
 import schedule
-# from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build 
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=".env")
+# ---------------- 🌐 FIX: WEB SERVER (REMOVE RENDER WARNING) ----------------
+from flask import Flask
+import threading
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+def run_server():
+    app.run(host="0.0.0.0", port=10000)
+
+threading.Thread(target=run_server).start()
+
+# ---------------- 🔐 ENV ----------------
+load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
 BOT_NAME = os.getenv("BOT_NAME")
 
-# ---------------- 🔧 CONFIG ----------------
-SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"] 
-  
-MAX_COMMENTS = 100
-
-HF_API_KEY = "HF_API_KEY"
+SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
 
-BOT_NAME = "BOT_NAME"
-
-# ---------------- 🔐 AUTH (RUN ONCE) ----------------
-# flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
-# credentials = flow.run_local_server(port=8080)
-# youtube = build("youtube", "v3", credentials=credentials)
-
-from google.oauth2.credentials import Credentials
-
+# ---------------- 🔐 AUTH ----------------
 credentials = Credentials.from_authorized_user_file("token.json", SCOPES)
 youtube = build("youtube", "v3", credentials=credentials)
 
@@ -69,11 +73,11 @@ def fallback_reply(comment, ctype, video_god):
     if video_god == "ram":
         return random.choice(["🙏 Jai Shri Ram!", "🙏 Jai Sita Ram!"])
     elif video_god == "shani":
-        return random.choice(["🙏 Jai Shani Dev!"])
+        return "🙏 Jai Shani Dev!"
     elif video_god == "sai":
-        return random.choice(["🙏 Om Sai Ram!"])
+        return "🙏 Om Sai Ram!"
     elif video_god == "krishna":
-        return random.choice(["🙏 Hare Krishna!"])
+        return "🙏 Hare Krishna!"
 
     if ctype == "request":
         return "👍 Tappakunda upload chestam soon!"
@@ -118,19 +122,17 @@ Reply:
     except:
         return fallback_reply(comment, ctype, video_god)
 
-# ---------------- 🔁 MAIN BOT FUNCTION ----------------
+# ---------------- 🔁 MAIN BOT ----------------
 def run_bot():
 
     print("\n🔁 Running bot...\n")
 
-    # Load JSON
     try:
         with open("replied_comments.json", "r") as f:
             replied_comments = json.load(f)
     except:
         replied_comments = []
 
-    # 🔥 PAGINATION LOOP
     next_page_token = None
 
     while True:
@@ -154,7 +156,6 @@ def run_bot():
             if comment_id in replied_comments:
                 continue
 
-            # Check already replied
             already_replied = False
             if "replies" in item:
                 for reply in item["replies"]["comments"]:
@@ -166,7 +167,6 @@ def run_bot():
                 replied_comments.append(comment_id)
                 continue
 
-            # Get video title
             video_details = youtube.videos().list(
                 part="snippet",
                 id=video_id
@@ -199,7 +199,6 @@ def run_bot():
         if not next_page_token:
             break
 
-    # Save JSON
     with open("replied_comments.json", "w") as f:
         json.dump(replied_comments, f)
 
@@ -212,4 +211,4 @@ print("🚀 Bot started (runs every 10 mins)...")
 
 while True:
     schedule.run_pending()
-    time.sleep(1) 
+    time.sleep(1)
