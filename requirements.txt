@@ -1,3 +1,13 @@
+#   python bot.py
+#  C:\Users\jinka\venv\Scripts\activate
+#  pip install -r requirements.txt
+#  git init
+#  git add .
+#  git commit -m "AI YouTube bot updated with scheduler + memory + smart replies"
+#  git branch -M main
+#  git remote add origin https://github.com/SwethaNTAJ/Hermoso-youtube-bot.git
+#  git push -u origin main
+#  git push origin main --force
 flask
 requests
 google-api-python-client
