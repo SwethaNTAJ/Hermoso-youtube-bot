@@ -1,6 +1,6 @@
 Project Title
 
-AI YouTube Comment Auto-Reply Bot
+AI YouTube Comment Auto-Reply Bot :“AI + GenAI + Lightweight Agentic AI system for YouTube comment automation using LLM-based response generation and API orchestration.”
 
 Description
 
